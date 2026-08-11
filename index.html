@@ -119,7 +119,12 @@
   }
 
   main { max-width: 60rem; margin: 0 auto; padding: 1.75rem 1.25rem 5rem; }
+  /* Panels enter and leave along the same axis the pill travels, so the
+     outbound path is the return path reversed. The outgoing panel floats
+     out of flow so the incoming one drives the container height. */
+  #viewport { position: relative; overflow-x: clip; }
   .view[hidden] { display: none; }
+  .view.floating { position: absolute; top: 0; left: 0; right: 0; }
 
   .eyebrow {
     font-size: .68rem; text-transform: uppercase; letter-spacing: .1em;
@@ -286,6 +291,7 @@
 </header>
 
 <main>
+<div id="viewport">
   <!-- ============ TARGET ============ -->
   <section class="view" id="viewTarget" role="tabpanel" aria-labelledby="tabTarget">
     <div class="card">
@@ -401,6 +407,7 @@
       </ul>
     </div>
   </section>
+</div>
 </main>
 
 <script>
@@ -463,15 +470,72 @@ const DATA = { syncedAt: null, stations: {}, runPace: null };
   let pillX = 0, pillStop = null;
   const setPill = (x) => { pillX = x; pill.style.transform = `translateX(${x}px)`; };
 
+  const viewport = document.getElementById("viewport");
+  let pos = 0;                       // 0 = Target fully shown, 1 = Plan fully shown
+  let dest = 0, curH = null;
+  let posStop = null, hStop = null;
+
+  // Shift is a fraction of the viewport so the gesture reads the same at any width.
+  const shift = () => (reduced ? 0 : Math.min(viewport.clientWidth * 0.16, 88));
+
+  function paintViews() {
+    const d = shift();
+    views[0].style.transform = `translateX(${-pos * d}px)`;
+    views[0].style.opacity = String(1 - pos);
+    views[1].style.transform = `translateX(${(1 - pos) * d}px)`;
+    views[1].style.opacity = String(pos);
+  }
+
+  function settleViews() {
+    if (hStop) { hStop(); hStop = null; }
+    views.forEach((v, j) => {
+      const on = j === dest;
+      v.hidden = !on;
+      v.inert = !on;
+      v.setAttribute("aria-hidden", String(!on));
+      v.classList.remove("floating");
+      v.style.transform = "";
+      v.style.opacity = "";
+      v.style.willChange = "";      // only hint while motion is actually imminent
+    });
+    viewport.style.height = "";     // back to auto so week changes can resize it
+    curH = null;
+  }
+
   function selectTab(i, animate = true) {
     tabs.forEach((t, j) => t.setAttribute("aria-selected", String(j === i)));
-    views.forEach((v, j) => { v.hidden = j !== i; });
+
     const btn = tabs[i];
     pill.style.width = btn.offsetWidth + "px";
     const to = btn.offsetLeft;
-    if (pillStop) pillStop();
-    if (!animate) { setPill(to); return; }
-    pillStop = spring(() => pillX, setPill, to, { duration: 0.34, bounce: 0 });
+    // Carry the in-flight velocity into the new spring rather than hard-cutting it,
+    // which is what makes a reversal feel continuous instead of hitting a wall.
+    const pillV = pillStop ? pillStop() || 0 : 0;
+    if (animate) pillStop = spring(() => pillX, setPill, to, { duration: 0.34, bounce: 0, velocity: pillV });
+    else { pillStop = null; setPill(to); }
+
+    dest = i;
+    if (!animate) { pos = i; settleViews(); return; }
+
+    // Render both while moving; the destination panel stays in flow and sets the height.
+    views.forEach((v, j) => {
+      v.hidden = false;
+      v.inert = j !== i;
+      v.setAttribute("aria-hidden", String(j !== i));
+      v.classList.toggle("floating", j !== i);
+      v.style.willChange = "transform, opacity";
+    });
+
+    if (curH == null) curH = viewport.offsetHeight;
+    viewport.style.height = curH + "px";
+    const destH = views[i].offsetHeight;
+
+    const posV = posStop ? posStop() || 0 : 0;
+    const hV = hStop ? hStop() || 0 : 0;
+    posStop = spring(() => pos, (v) => { pos = v; paintViews(); }, i,
+      { duration: 0.42, bounce: 0, velocity: posV, onDone: settleViews });
+    hStop = spring(() => curH, (v) => { curH = v; viewport.style.height = v + "px"; }, destH,
+      { duration: 0.42, bounce: 0, velocity: hV });
   }
   tabs.forEach((t, i) => {
     t.addEventListener("pointerdown", () => { t.style.opacity = ".62"; });
