@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doubles — HYROX Paris race target &amp; training block</title>
+</head>
+<body>
+<style>
+  :root {
+    --ink:      #12161a;
+    --ink-2:    #3d4852;
+    --muted:    #6a7682;
+    --bg:       #eef1f2;
+    --surface:  #ffffff;
+    --sunken:   #e4e8ea;
+    --line:     rgba(18,22,26,.11);
+    --line-2:   rgba(18,22,26,.06);
+    --run:      #0d7382;
+    --station:  #a86a12;
+    --rox:      #635c78;
+    --run-w:    #0d7382;
+    --bad:      #b3261e;
+    --shadow:   0 1px 2px rgba(18,22,26,.05), 0 8px 24px -12px rgba(18,22,26,.18);
+    --glass:    rgba(238,241,242,.72);
+
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+
+    --r-lg: 20px;
+    --r-md: 13px;
+    --r-sm: 7px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink:     #e9eef2;
+      --ink-2:   #b9c4cd;
+      --muted:   #8794a1;
+      --bg:      #0d1316;
+      --surface: #161e23;
+      --sunken:  #101619;
+      --line:    rgba(233,238,242,.13);
+      --line-2:  rgba(233,238,242,.07);
+      --run:     #33cfe2;
+      --station: #efa53d;
+      --rox:     #a79cc6;
+      --run-w:   #33cfe2;
+      --bad:     #ff8a80;
+      --shadow:  0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.7);
+      --glass:   rgba(13,19,22,.72);
+    }
+  }
+  :root[data-theme="light"] {
+    --ink:#12161a; --ink-2:#3d4852; --muted:#6a7682; --bg:#eef1f2; --surface:#fff;
+    --sunken:#e4e8ea; --line:rgba(18,22,26,.11); --line-2:rgba(18,22,26,.06);
+    --run:#0d7382; --station:#a86a12; --rox:#635c78; --run-w:#0d7382; --bad:#b3261e;
+    --shadow:0 1px 2px rgba(18,22,26,.05), 0 8px 24px -12px rgba(18,22,26,.18);
+    --glass:rgba(238,241,242,.72);
+  }
+  :root[data-theme="dark"] {
+    --ink:#e9eef2; --ink-2:#b9c4cd; --muted:#8794a1; --bg:#0d1316; --surface:#161e23;
+    --sunken:#101619; --line:rgba(233,238,242,.13); --line-2:rgba(233,238,242,.07);
+    --run:#33cfe2; --station:#efa53d; --rox:#a79cc6; --run-w:#33cfe2; --bad:#ff8a80;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glass:rgba(13,19,22,.72);
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body { min-height: 100vh; }
+  main { padding-top: 1.25rem; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+  /* ---------- chrome ---------- */
+  header.bar {
+    position: sticky; top: 0; z-index: 40;
+    background: var(--glass);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .bar-in {
+    max-width: 60rem; margin: 0 auto; padding: .75rem 1.25rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .wordmark {
+    font-size: .95rem; font-weight: 640; letter-spacing: -.01em; margin: 0;
+    display: flex; align-items: baseline; gap: .55rem;
+  }
+  .wordmark span { font-weight: 400; color: var(--muted); font-size: .8rem; letter-spacing: .01em; }
+  .spacer { flex: 1 1 auto; }
+
+  .seg {
+    display: inline-flex; position: relative; padding: 3px;
+    background: var(--sunken); border-radius: 11px; border: 1px solid var(--line-2);
+  }
+  .seg button {
+    position: relative; z-index: 2; appearance: none; border: 0; background: none;
+    font: inherit; font-size: .82rem; font-weight: 560; color: var(--muted);
+    padding: .3rem .9rem; border-radius: 8px; cursor: pointer;
+    transition: color 140ms ease;
+  }
+  .seg button[aria-selected="true"] { color: var(--ink); }
+  .seg button:focus-visible { outline: 2px solid var(--run); outline-offset: 2px; }
+  .seg-pill {
+    position: absolute; z-index: 1; top: 3px; bottom: 3px; left: 0;
+    background: var(--surface); border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.12);
+  }
+
+  main { max-width: 60rem; margin: 0 auto; padding: 1.75rem 1.25rem 5rem; }
+  .view[hidden] { display: none; }
+
+  .eyebrow {
+    font-size: .68rem; text-transform: uppercase; letter-spacing: .1em;
+    font-weight: 620; color: var(--muted); margin: 0 0 .5rem;
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-lg); box-shadow: var(--shadow);
+  }
+
+  /* ---------- target readout ---------- */
+  .readout { padding: 1.75rem 1.5rem 1.5rem; }
+  .readout-grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 40rem) { .readout-grid { grid-template-columns: 1fr 1fr; } }
+
+  .stat-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 620; }
+  .big {
+    display: block; font-size: clamp(3rem, 12vw, 4.75rem); line-height: .95;
+    letter-spacing: -.045em; font-weight: 600; margin: .3rem 0 0;
+  }
+  .big.pace { color: var(--run-w); }
+  .big.unfeasible { color: var(--bad); font-size: clamp(1.5rem, 5vw, 2.1rem); letter-spacing: -.02em; line-height: 1.15; }
+  .sub { color: var(--muted); font-size: .85rem; margin: .45rem 0 0; }
+
+  /* ---------- scrubber ---------- */
+  .scrub-wrap { padding: 0 1.5rem 1.5rem; }
+  .scrub {
+    position: relative; height: 56px; border-radius: var(--r-md);
+    background: var(--sunken); border: 1px solid var(--line-2);
+    cursor: grab; touch-action: none; overflow: hidden;
+    user-select: none; -webkit-user-select: none;
+  }
+  .scrub.dragging { cursor: grabbing; }
+  .scrub:focus-visible { outline: 2px solid var(--run); outline-offset: 3px; }
+  .ticks { position: absolute; inset: 0; pointer-events: none; }
+  .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
+  .tick.major { background: var(--line); opacity: .9; }
+  .tick-label {
+    position: absolute; bottom: 5px; transform: translateX(-50%);
+    font-size: .6rem; color: var(--muted); letter-spacing: .04em;
+  }
+  .thumb {
+    position: absolute; top: 6px; bottom: 6px; width: 4px; margin-left: -2px;
+    border-radius: 3px; background: var(--run-w); pointer-events: none;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--run-w) 16%, transparent);
+  }
+  .fill { position: absolute; top: 0; bottom: 0; left: 0; background: color-mix(in srgb, var(--run-w) 9%, transparent); pointer-events: none; }
+
+  /* ---------- proportion bar ---------- */
+  .prop { display: flex; height: 34px; border-radius: var(--r-sm); overflow: hidden; border: 1px solid var(--line-2); }
+  .prop > div { position: relative; }
+  .prop-run { background: var(--run); }
+  .prop-station { background: var(--station); }
+  .prop-rox { background: var(--rox); }
+  .legend { display: flex; flex-wrap: wrap; gap: 1.1rem; margin-top: .7rem; }
+  .legend div { display: flex; align-items: center; gap: .45rem; font-size: .78rem; color: var(--ink-2); }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  /* ---------- stations ---------- */
+  .stations { margin-top: 1.25rem; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 30rem; }
+  th {
+    text-align: left; font-size: .68rem; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); font-weight: 620; padding: 0 .6rem .55rem; border-bottom: 1px solid var(--line);
+  }
+  th.r, td.r { text-align: right; }
+  td { padding: .5rem .6rem; border-bottom: 1px solid var(--line-2); font-size: .9rem; }
+  tr:last-child td { border-bottom: 0; }
+  .leg-cell { display: flex; align-items: center; gap: .55rem; }
+  .idx { font-size: .7rem; color: var(--muted); width: 1.1rem; flex: none; }
+  .stepper { display: inline-flex; align-items: center; gap: .1rem; }
+  .step {
+    appearance: none; border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink-2); width: 26px; height: 26px; border-radius: var(--r-sm);
+    font: inherit; font-size: .95rem; line-height: 1; cursor: pointer;
+    display: grid; place-items: center; padding: 0;
+  }
+  .step:active { background: var(--sunken); transform: scale(.92); }
+  .step:focus-visible { outline: 2px solid var(--run); outline-offset: 1px; }
+  .time-val { min-width: 3.6rem; text-align: right; font-size: .92rem; }
+
+  .note {
+    margin-top: 1rem; padding: .85rem 1rem; border-radius: var(--r-md);
+    background: var(--sunken); border: 1px solid var(--line-2);
+    font-size: .82rem; color: var(--ink-2); line-height: 1.55;
+  }
+
+  /* ---------- plan ---------- */
+  .countdown { display: flex; flex-wrap: wrap; gap: 2rem; padding: 1.35rem 1.5rem; }
+  .cd-val { font-size: 2.1rem; font-weight: 600; letter-spacing: -.03em; line-height: 1.05; display: block; margin-top: .15rem; }
+
+  .weeks { display: flex; gap: .4rem; overflow-x: auto; padding: .15rem .15rem .5rem; margin-top: 1.5rem; }
+  .wk {
+    appearance: none; border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink-2); font: inherit; font-size: .8rem; font-weight: 560;
+    padding: .45rem .8rem; border-radius: var(--r-sm); cursor: pointer; white-space: nowrap;
+  }
+  .wk:active { transform: scale(.95); }
+  .wk[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .wk:focus-visible { outline: 2px solid var(--run); outline-offset: 2px; }
+
+  .wk-head { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; margin: 1.5rem 0 .85rem; }
+  .wk-head h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.02em; font-weight: 620; }
+  .wk-head p { margin: 0; color: var(--muted); font-size: .85rem; }
+
+  .days { display: grid; gap: .5rem; }
+  .day {
+    display: grid; grid-template-columns: 3.5rem 1fr; gap: .9rem;
+    padding: .85rem 1rem; align-items: start;
+  }
+  .day.today { border-color: var(--run-w); }
+  .dstamp { color: var(--muted); font-size: .74rem; line-height: 1.35; padding-top: .1rem; }
+  .dstamp b { display: block; color: var(--ink-2); font-size: .8rem; font-weight: 620; }
+  .dtitle { margin: 0; font-size: .95rem; font-weight: 600; letter-spacing: -.01em; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .ddetail { margin: .3rem 0 0; font-size: .82rem; color: var(--ink-2); line-height: 1.5; }
+  .dhevy { margin: .4rem 0 0; font-size: .74rem; color: var(--muted); display: flex; align-items: center; gap: .35rem; }
+  .dhevy::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); flex: none; }
+
+  .chip {
+    font-size: .64rem; text-transform: uppercase; letter-spacing: .07em; font-weight: 660;
+    padding: .16rem .42rem; border-radius: 5px; white-space: nowrap;
+  }
+  .k-run      { color: var(--run);     background: color-mix(in srgb, var(--run) 13%, transparent); }
+  .k-strength { color: var(--station); background: color-mix(in srgb, var(--station) 15%, transparent); }
+  .k-machine  { color: var(--rox);     background: color-mix(in srgb, var(--rox) 16%, transparent); }
+  .k-hyrox    { color: var(--ink-2);   background: var(--sunken); }
+  .k-doubles  { color: var(--bg);      background: var(--ink); }
+  .k-rest     { color: var(--muted);   background: var(--sunken); }
+  .k-race     { color: var(--bg);      background: var(--run-w); }
+
+  .day.rest { opacity: .72; }
+
+  /* ---------- footer panel ---------- */
+  .soon { margin-top: 2.25rem; padding: 1.35rem 1.5rem; }
+  .soon h2 { margin: 0 0 .2rem; font-size: 1rem; letter-spacing: -.015em; font-weight: 620; }
+  .soon ul { margin: .9rem 0 0; padding-left: 1.1rem; color: var(--ink-2); font-size: .85rem; line-height: 1.65; }
+  .soon li { margin-bottom: .3rem; }
+  .pending {
+    display: inline-flex; align-items: center; gap: .4rem; font-size: .68rem;
+    text-transform: uppercase; letter-spacing: .08em; font-weight: 620; color: var(--muted);
+  }
+  .pending::before { content: ""; width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid var(--muted); flex: none; }
+
+  @media (prefers-reduced-transparency: reduce) {
+    header.bar { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto !important; }
+    .step:active, .wk:active { transform: none; }
+  }
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <h1 class="wordmark">Doubles <span>HYROX Paris</span></h1>
+    <div class="spacer"></div>
+    <div class="seg" role="tablist" aria-label="View">
+      <div class="seg-pill" id="segPill"></div>
+      <button role="tab" id="tabTarget" aria-selected="true" aria-controls="viewTarget">Target</button>
+      <button role="tab" id="tabPlan" aria-selected="false" aria-controls="viewPlan">Plan</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ TARGET ============ -->
+  <section class="view" id="viewTarget" role="tabpanel" aria-labelledby="tabTarget">
+    <div class="card">
+      <div class="readout">
+        <div class="readout-grid">
+          <div>
+            <div class="stat-label">Target finish</div>
+            <span class="big num" id="targetOut">1:30:00</span>
+            <p class="sub">Drag the strip below. Snaps to 5&nbsp;seconds.</p>
+          </div>
+          <div>
+            <div class="stat-label">Required run pace</div>
+            <span class="big num pace" id="paceOut">7:21</span>
+            <p class="sub" id="paceSub">per kilometre, held across all 8&nbsp;runs</p>
+          </div>
+        </div>
+      </div>
+      <div class="scrub-wrap">
+        <div class="scrub" id="scrub" tabindex="0" role="slider"
+             aria-label="Target finish time"
+             aria-valuemin="3300" aria-valuemax="7200" aria-valuenow="5400" aria-valuetext="1 hour 30 minutes">
+          <div class="fill" id="scrubFill"></div>
+          <div class="ticks" id="ticks"></div>
+          <div class="thumb" id="thumb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <p class="eyebrow">Where the time goes</p>
+      <div class="prop" id="prop">
+        <div class="prop-run" id="propRun"></div>
+        <div class="prop-station" id="propStation"></div>
+        <div class="prop-rox" id="propRox"></div>
+      </div>
+      <div class="legend">
+        <div><span class="swatch" style="background:var(--run)"></span> Running <b class="num" id="legRun" style="font-weight:600">&nbsp;</b></div>
+        <div><span class="swatch" style="background:var(--station)"></span> Stations <b class="num" id="legStation" style="font-weight:600">&nbsp;</b></div>
+        <div><span class="swatch" style="background:var(--rox)"></span> Roxzone <b class="num" id="legRox" style="font-weight:600">&nbsp;</b></div>
+      </div>
+    </div>
+
+    <div class="card stations" style="margin-top:1.5rem; padding:1.25rem 1rem">
+      <table>
+        <thead>
+          <tr>
+            <th>Station</th>
+            <th class="r">Split</th>
+            <th class="r" style="width:6.5rem">Adjust</th>
+          </tr>
+        </thead>
+        <tbody id="stationRows"></tbody>
+        <tfoot>
+          <tr>
+            <td style="padding-top:.8rem; border-top:1px solid var(--line); font-weight:600">Roxzone, all transitions</td>
+            <td class="r num" style="padding-top:.8rem; border-top:1px solid var(--line); font-weight:600" id="roxVal">5:00</td>
+            <td class="r" style="padding-top:.8rem; border-top:1px solid var(--line)">
+              <span class="stepper">
+                <button class="step" data-rox="-5" aria-label="Decrease roxzone by 5 seconds">&minus;</button>
+                <button class="step" data-rox="5" aria-label="Increase roxzone by 5 seconds">+</button>
+              </span>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="note">
+        Station splits are <b>estimates</b>, not measured. They are here to be overwritten. Week&nbsp;1 Friday is the ski and row benchmark — put those two real numbers in first, then the rest as you hit them in the simulation on week&nbsp;5 Saturday. Rep counts and sled weights vary by division and change between seasons, so check the current HYROX rulebook rather than trusting these defaults.
+      </div>
+    </div>
+
+    <div class="card soon">
+      <span class="pending" id="syncState">Not connected</span>
+      <h2 style="margin-top:.55rem">Measured against actual</h2>
+      <p style="margin:.15rem 0 0; color:var(--muted); font-size:.85rem">Everything above is the plan. None of it is your real output yet.</p>
+      <ul>
+        <li><b>Hevy</b> — sled, wall ball, lunge and erg work is already logged there against the 11 routines. Pulling it in replaces the estimated station splits with what you actually did.</li>
+        <li><b>Strava</b> — the 8&nbsp;×&nbsp;1km run pace is the single biggest lever on finish time. Interval sessions carry the pace you can hold under fatigue, which is the number that belongs in this calculator.</li>
+        <li><b>Benchmark comparison</b> — you asked where this sits against an average doubles team. I don't have verified finish-time distribution data, so nothing is shown rather than a number I'd be making up. It needs a real source before it goes in.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PLAN ============ -->
+  <section class="view" id="viewPlan" role="tabpanel" aria-labelledby="tabPlan" hidden>
+    <div class="card countdown">
+      <div>
+        <div class="stat-label">Block starts</div>
+        <span class="cd-val num" id="cdStart">—</span>
+        <p class="sub" style="margin-top:.1rem">Mon 26 Oct 2026</p>
+      </div>
+      <div>
+        <div class="stat-label">Race day</div>
+        <span class="cd-val num" id="cdRace">—</span>
+        <p class="sub" style="margin-top:.1rem">Sat 19 Dec 2026</p>
+      </div>
+    </div>
+
+    <div class="weeks" id="weeks" role="tablist" aria-label="Week"></div>
+
+    <div class="wk-head">
+      <h2 id="wkTitle">Week 1</h2>
+      <p id="wkTheme"></p>
+    </div>
+    <div class="days" id="days"></div>
+
+    <div class="card soon">
+      <span class="pending">Rebuilt</span>
+      <h2 style="margin-top:.55rem">This isn't the programme as written</h2>
+      <ul>
+        <li>The second strength day moved off Friday. As published it ran Friday strength into Saturday doubles into the Sunday long run, three straight days on the legs.</li>
+        <li>Each strength day is now genuinely full body. The source has one upper-body exercise per session, and no upper-body pulling at all across weeks&nbsp;5 to&nbsp;8.</li>
+        <li>Romanian deadlifts replace conventional, at 6&nbsp;reps rather than 3, because an RDL doesn't work as a heavy triple.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+/* SYNC BLOCK — rewritten in place by the scheduled job.
+   --- BEGIN SYNC DATA --- */
+const DATA = { syncedAt: null, stations: {}, runPace: null };
+/* --- END SYNC DATA --- */
+</script>
+<script>
+(() => {
+  "use strict";
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- spring ---------- */
+  function spring(get, set, target, { velocity = 0, bounce = 0, duration = 0.4, onDone } = {}) {
+    if (reduced) { set(target); onDone && onDone(); return () => {}; }
+    const zeta = 1 - Math.max(0, Math.min(1, bounce));
+    const omega = (2 * Math.PI) / duration;
+    const k = omega * omega, c = 2 * zeta * omega;
+    let x = get(), v = velocity, raf = 0, last = performance.now(), alive = true;
+    const step = (now) => {
+      if (!alive) return;
+      let dt = Math.min((now - last) / 1000, 1 / 30); last = now;
+      // sub-step for stability
+      const n = Math.max(1, Math.ceil(dt / (1 / 240)));
+      const h = dt / n;
+      for (let i = 0; i < n; i++) {
+        const a = -k * (x - target) - c * v;
+        v += a * h; x += v * h;
+      }
+      set(x);
+      if (Math.abs(x - target) < 0.15 && Math.abs(v) < 0.6) { set(target); alive = false; onDone && onDone(); return; }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => { alive = false; cancelAnimationFrame(raf); return v; };
+  }
+  const project = (v, d = 0.998) => (v / 1000) * d / (1 - d);
+  function rubberband(over, dim, cst = 0.55) {
+    return (over * dim * cst) / (dim + cst * Math.abs(over));
+  }
+
+  /* ---------- format ---------- */
+  const pad = (n) => String(n).padStart(2, "0");
+  function hms(s) {
+    s = Math.max(0, Math.round(s));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    return h ? `${h}:${pad(m)}:${pad(s % 60)}` : `${m}:${pad(s % 60)}`;
+  }
+  const ms = (s) => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
+  function spoken(s) {
+    const h = Math.floor(s / 3600), m = Math.round((s % 3600) / 60);
+    return `${h ? h + " hour " : ""}${m} minutes`;
+  }
+
+  /* ---------- segmented control ---------- */
+  const pill = document.getElementById("segPill");
+  const tabs = [document.getElementById("tabTarget"), document.getElementById("tabPlan")];
+  const views = [document.getElementById("viewTarget"), document.getElementById("viewPlan")];
+  let pillX = 0, pillStop = null;
+  const setPill = (x) => { pillX = x; pill.style.transform = `translateX(${x}px)`; };
+
+  function selectTab(i, animate = true) {
+    tabs.forEach((t, j) => t.setAttribute("aria-selected", String(j === i)));
+    views.forEach((v, j) => { v.hidden = j !== i; });
+    const btn = tabs[i];
+    pill.style.width = btn.offsetWidth + "px";
+    const to = btn.offsetLeft;
+    if (pillStop) pillStop();
+    if (!animate) { setPill(to); return; }
+    pillStop = spring(() => pillX, setPill, to, { duration: 0.34, bounce: 0 });
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener("pointerdown", () => { t.style.opacity = ".62"; });
+    t.addEventListener("pointerup", () => { t.style.opacity = ""; });
+    t.addEventListener("pointercancel", () => { t.style.opacity = ""; });
+    t.addEventListener("click", () => selectTab(i));
+  });
+
+  /* ---------- model ---------- */
+  const STATIONS = [
+    { n: "1000 m SkiErg",        t: 225 },
+    { n: "50 m Sled Push",       t: 150 },
+    { n: "50 m Sled Pull",       t: 180 },
+    { n: "80 m Burpee Broad Jump", t: 210 },
+    { n: "1000 m Row",           t: 225 },
+    { n: "200 m Farmers Carry",  t: 105 },
+    { n: "100 m Sandbag Lunges", t: 210 },
+    { n: "Wall Balls",           t: 270 },
+  ];
+  let rox = 300;
+  let target = 5400;              // seconds
+  const MIN = 3300, MAX = 7200;
+
+  const stationTotal = () => STATIONS.reduce((a, s) => a + s.t, 0);
+
+  /* ---------- station table ---------- */
+  const mk = (tag, cls, txt) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (txt != null) n.textContent = txt;
+    return n;
+  };
+
+  const rowsEl = document.getElementById("stationRows");
+  STATIONS.forEach((s, i) => {
+    const tr = document.createElement("tr");
+
+    const tdName = mk("td");
+    const leg = mk("span", "leg-cell");
+    leg.append(mk("span", "idx num", String(i + 1)), document.createTextNode(s.n));
+    tdName.append(leg);
+
+    const tdTime = mk("td", "r num time-val", ms(s.t));
+    tdTime.dataset.t = String(i);
+
+    const tdAdj = mk("td", "r");
+    const step = mk("span", "stepper");
+    [["-5", "−", "Decrease"], ["5", "+", "Increase"]].forEach(([d, glyph, verb]) => {
+      const b = mk("button", "step", glyph);
+      b.type = "button";
+      b.dataset.i = String(i);
+      b.dataset.d = d;
+      b.setAttribute("aria-label", `${verb} ${s.n} by 5 seconds`);
+      step.append(b);
+    });
+    tdAdj.append(step);
+
+    tr.append(tdName, tdTime, tdAdj);
+    rowsEl.append(tr);
+  });
+
+  function bumpStation(i, d) {
+    STATIONS[i].t = Math.max(30, STATIONS[i].t + d);
+    rowsEl.querySelector(`[data-t="${i}"]`).textContent = ms(STATIONS[i].t);
+    render();
+  }
+  function bumpRox(d) {
+    rox = Math.max(0, rox + d);
+    document.getElementById("roxVal").textContent = ms(rox);
+    render();
+  }
+
+  // press-and-hold with acceleration, feedback on pointer-down
+  function holdable(btn, fn) {
+    let timer = null, delay = 380;
+    const stop = () => { clearTimeout(timer); timer = null; delay = 380; };
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      btn.setPointerCapture(e.pointerId);
+      fn();
+      const tick = () => { fn(); delay = Math.max(45, delay * 0.72); timer = setTimeout(tick, delay); };
+      timer = setTimeout(tick, delay);
+    });
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach((ev) => btn.addEventListener(ev, stop));
+  }
+  rowsEl.querySelectorAll(".step").forEach((b) =>
+    holdable(b, () => bumpStation(+b.dataset.i, +b.dataset.d)));
+  document.querySelectorAll("[data-rox]").forEach((b) =>
+    holdable(b, () => bumpRox(+b.dataset.rox)));
+
+  /* ---------- proportion bar ---------- */
+  const propRun = document.getElementById("propRun");
+  const propSta = document.getElementById("propStation");
+  const propRox = document.getElementById("propRox");
+  let wR = 0, wS = 0, wX = 0, stopR = null, stopS = null, stopX = null;
+  let tR = -1, tS = -1, tX = -1;          // current spring targets
+  let liveScrub = false;                  // true while dragging or settling
+  const applyProp = () => {
+    propRun.style.flex = `0 0 ${wR}%`;
+    propSta.style.flex = `0 0 ${wS}%`;
+    propRox.style.flex = `0 0 ${wX}%`;
+  };
+  function setProp(r, s, x) {
+    // Scrubbing is already a 1:1 gesture — track it directly rather than
+    // spawning a fresh spring on every frame.
+    if (liveScrub) {
+      if (stopR) { stopR(); stopR = null; } if (stopS) { stopS(); stopS = null; } if (stopX) { stopX(); stopX = null; }
+      tR = r; tS = s; tX = x;
+      wR = r; wS = s; wX = x; applyProp();
+      return;
+    }
+    if (Math.abs(r - tR) < 0.01 && Math.abs(s - tS) < 0.01 && Math.abs(x - tX) < 0.01) return;
+    tR = r; tS = s; tX = x;
+    if (stopR) stopR(); if (stopS) stopS(); if (stopX) stopX();
+    stopR = spring(() => wR, (v) => { wR = v; applyProp(); }, r, { duration: 0.45 });
+    stopS = spring(() => wS, (v) => { wS = v; applyProp(); }, s, { duration: 0.45 });
+    stopX = spring(() => wX, (v) => { wX = v; applyProp(); }, x, { duration: 0.45 });
+  }
+
+  /* ---------- render ---------- */
+  const targetOut = document.getElementById("targetOut");
+  const paceOut = document.getElementById("paceOut");
+  const paceSub = document.getElementById("paceSub");
+  const scrub = document.getElementById("scrub");
+
+  function render() {
+    const st = stationTotal();
+    const runBudget = target - st - rox;
+    targetOut.textContent = hms(target);
+
+    if (runBudget <= 0) {
+      paceOut.className = "big num pace unfeasible";
+      paceOut.textContent = "Stations alone exceed this";
+      paceSub.textContent = `Stations and roxzone come to ${hms(st + rox)}. Raise the target or cut the splits.`;
+      setProp(0, (st / (st + rox)) * 100, (rox / (st + rox)) * 100);
+    } else {
+      const per = runBudget / 8;
+      paceOut.className = "big num pace";
+      paceOut.textContent = ms(per);
+      paceSub.textContent = `per kilometre, held across all 8 runs — ${hms(runBudget)} of running`;
+      const tot = runBudget + st + rox;
+      setProp((runBudget / tot) * 100, (st / tot) * 100, (rox / tot) * 100);
+    }
+    document.getElementById("legRun").textContent = runBudget > 0 ? hms(runBudget) : "0:00";
+    document.getElementById("legStation").textContent = hms(st);
+    document.getElementById("legRox").textContent = hms(rox);
+
+    scrub.setAttribute("aria-valuenow", String(target));
+    scrub.setAttribute("aria-valuetext", spoken(target));
+  }
+
+  /* ---------- scrubber: 1:1 drag, rubber-band, momentum, velocity handoff ---------- */
+  const thumb = document.getElementById("thumb");
+  const fill = document.getElementById("scrubFill");
+  const ticksEl = document.getElementById("ticks");
+
+  const width = () => scrub.clientWidth;
+  const t2x = (t) => ((t - MIN) / (MAX - MIN)) * width();
+  const x2t = (x) => MIN + (x / width()) * (MAX - MIN);
+
+  let px = 0;                          // visual position in px (may exceed bounds while dragging)
+  function paint(x) {
+    px = x;
+    thumb.style.transform = `translateX(${x}px)`;
+    fill.style.width = Math.max(0, x) + "px";
+  }
+  function commit(x, { silent } = {}) {
+    const clamped = Math.max(0, Math.min(width(), x));
+    target = Math.round(x2t(clamped) / 5) * 5;
+    target = Math.max(MIN, Math.min(MAX, target));
+    if (!silent) render();
+  }
+
+  function buildTicks() {
+    ticksEl.innerHTML = "";
+    const w = width();
+    for (let t = 3600; t <= MAX; t += 300) {
+      const x = t2x(t);
+      const major = t % 900 === 0;
+      const d = document.createElement("div");
+      d.className = "tick" + (major ? " major" : "");
+      d.style.left = x + "px";
+      d.style.opacity = major ? "1" : ".45";
+      ticksEl.appendChild(d);
+      if (major) {
+        const l = document.createElement("div");
+        l.className = "tick-label num";
+        l.style.left = x + "px";
+        // keep the end labels inside the track instead of letting them clip
+        l.style.transform = x < 26 ? "translateX(0)" : x > w - 26 ? "translateX(-100%)" : "translateX(-50%)";
+        l.textContent = hms(t);
+        ticksEl.appendChild(l);
+      }
+    }
+  }
+
+  let dragging = false, grabDX = 0, stopSpring = null;
+  let hist = [];
+
+  scrub.addEventListener("pointerdown", (e) => {
+    scrub.setPointerCapture(e.pointerId);
+    if (stopSpring) { stopSpring(); stopSpring = null; }
+    const rect = scrub.getBoundingClientRect();
+    const pointerX = e.clientX - rect.left;
+    const thumbX = t2x(target);
+    // respect where they grabbed if they took the thumb; otherwise jump to finger
+    grabDX = Math.abs(pointerX - thumbX) < 26 ? pointerX - thumbX : 0;
+    dragging = true;
+    liveScrub = true;
+    scrub.classList.add("dragging");
+    hist = [{ x: pointerX, t: performance.now() }];
+    const raw = pointerX - grabDX;
+    paint(raw); commit(raw);
+  });
+
+  scrub.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    const rect = scrub.getBoundingClientRect();
+    const pointerX = e.clientX - rect.left;
+    hist.push({ x: pointerX, t: performance.now() });
+    if (hist.length > 6) hist.shift();
+
+    let raw = pointerX - grabDX;
+    const w = width();
+    if (raw < 0) raw = rubberband(raw, w);
+    else if (raw > w) raw = w + rubberband(raw - w, w);
+    paint(raw);
+    commit(raw);
+  });
+
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    scrub.classList.remove("dragging");
+
+    // velocity from the last few samples
+    let v = 0;
+    if (hist.length >= 2) {
+      const a = hist[0], b = hist[hist.length - 1];
+      const dt = (b.t - a.t) / 1000;
+      if (dt > 0.001) v = (b.x - a.x) / dt;
+    }
+    const w = width();
+    let landing = px + project(v);
+    landing = Math.max(0, Math.min(w, landing));
+    // snap the landing point to a 5-second grid
+    const snapT = Math.max(MIN, Math.min(MAX, Math.round(x2t(landing) / 5) * 5));
+    const to = t2x(snapT);
+
+    stopSpring = spring(() => px, (x) => { paint(x); commit(x); }, to, {
+      velocity: v, bounce: Math.abs(v) > 300 ? 0.18 : 0, duration: 0.4,
+      onDone: () => { target = snapT; liveScrub = false; render(); }
+    });
+  }
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach((ev) => scrub.addEventListener(ev, endDrag));
+
+  scrub.addEventListener("keydown", (e) => {
+    const step = e.shiftKey ? 300 : 30;
+    let nt = target;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") nt -= step;
+    else if (e.key === "ArrowRight" || e.key === "ArrowUp") nt += step;
+    else if (e.key === "Home") nt = MIN;
+    else if (e.key === "End") nt = MAX;
+    else return;
+    e.preventDefault();
+    target = Math.max(MIN, Math.min(MAX, nt));
+    if (stopSpring) stopSpring();
+    stopSpring = spring(() => px, paint, t2x(target), { duration: 0.3 });
+    render();
+  });
+
+  /* ---------- plan data ---------- */
+  const THEMES = [
+    "Base. Benchmark the ski and row on Friday.",
+    "Volume up. Doubles runs go 400 m to 800 m.",
+    "Peak accumulation. Longest tempo of the block.",
+    "Deload. Sets drop, running stays sharp.",
+    "Power phase opens. Full simulation Saturday.",
+    "Power continues. Friday is a full rest day.",
+    "Peak intensity. Longest run intervals.",
+    "Taper. Everything faster than race pace.",
+  ];
+  const A1 = "Hevy · A1 Full Body A", A2 = "Hevy · A2 Full Body B";
+  const B1 = "Hevy · B1 Power A", B2 = "Hevy · B2 Power B";
+  const W = [
+    [ ["run","Aerobic Threshold Intervals","3-4 rds: 400 m @ Z3, 100 m jog, 2 min rest. Then 3 × 200 m fast."],
+      ["strength","Full Body A","Squat 6×10 @ 60 kg · DB bench 6×10 · Chest-supported row 4×10 · Sled push 3×50 m",A1],
+      ["hyrox","Hyrox Aerobic","40-60 min AMRAP @ Z2: 2 k run / 2 k row / 2 k ski"],
+      ["strength","Full Body B","Lunge 5×20 m · DB overhead press 4×8 · Pull-ups 4×6 · Sled drag 4×12 m",A2],
+      ["machine","Ski / Row Benchmark","1000 m ski for time, rest 10 min, 1000 m row for time. Log both.","Hevy · M1"],
+      ["doubles","Doubles Intervals","4 rounds off 400 m runs: ski, sled push, sled pull, burpee broad jumps"],
+      ["run","Long Run & Machines","40-60 min easy, then 8 × 60 s ski and 8 × 60 s row @ threshold","Hevy · M7"] ],
+    [ ["run","Anaerobic Threshold Intervals","3-4 rounds of 4 × 400 m @ high Z3. Then 3 × 200 m fast."],
+      ["strength","Full Body A","Squat 7×10 · DB bench 7×10 · Chest-supported row 4×10 · Sled push 1×62 m + 2×50 m",A1],
+      ["hyrox","Hybrid Machine Tempo","30 min AMRAP: 800 m run / 500 m ski / 750 m row @ high Z3"],
+      ["strength","Full Body B","Lunge 5×20 m · DB overhead press 4×8 · Pull-ups 4×6 · Sled drag 6×12 m",A2],
+      ["machine","Ski / Row 5 × 300 m","1 k pace + 4-5 s per 500 m. 60 s rest.","Hevy · M2"],
+      ["doubles","Doubles Intervals","4 rounds off 800 m runs"],
+      ["run","Long Run & Machines","50-60 min easy, then 10 × 60 s ski and 10 × 60 s row","Hevy · M7"] ],
+    [ ["run","Anaerobic Threshold Intervals","2 rounds of 3-4 × 800 m @ high Z3. Then 3 × 200 m."],
+      ["strength","Full Body A","Squat 8×10 · DB bench 8×10 · Chest-supported row 4×10 · Sled push 2×62 m + 1×50 m",A1],
+      ["hyrox","Hyrox Aerobic","50-60 min AMRAP: 2 k run / 100 m carry / 2 k row / 30 burpees / 2 k ski"],
+      ["strength","Full Body B","Lunge 5×20 m · DB overhead press 4×8 · Pull-ups 4×6 · Sled drag 6×12 m",A2],
+      ["machine","Ski / Row 200 m Repeats","2 rounds of 3 × 200 m @ 1 k pace, each machine","Hevy · M3"],
+      ["doubles","Hyrox Tempo","45 min AMRAP. 1000 m ski buy-in, then 800 m run / 50 m BBJ / 800 m / 750 m row / 800 m / 60 m lunges"],
+      ["run","Long Run & Machines","50-60 min easy, then 12 × 60 s ski and 12 × 60 s row","Hevy · M7"] ],
+    [ ["run","Anaerobic Threshold Intervals","1600 / 1200 / 1000 / 800 m @ high Z3. Then 3 × 200 m."],
+      ["strength","Full Body A · deload","Squat 3×10 · DB bench 3×10 · Chest-supported row 4×10 · Sled push 1×75 m",A1],
+      ["hyrox","Hybrid Machine Tempo","2 rounds of 20 min AMRAP: 1000 m run / 500 m ski / 750 m row"],
+      ["strength","Full Body B · deload","Lunge 3×20 m · DB overhead press 4×8 · Pull-ups 4×6 · Sled drag 3×25 m",A2],
+      ["rest","Easy Aerobic","Easy run, bike or machine. Or take it off."],
+      ["doubles","Doubles Intervals","5 rounds off 1000 m runs: ski, push, pull, burpees, row"],
+      ["run","Long Run & Machines","50-60 min easy, plus optional 20-40 min Z2 machine work"] ],
+    [ ["strength","Power A","Sled push 5×12 m @ race weight · Heavy lunge 3×20 m · Push press 4×5 · Pull-ups 4×5 · Wall balls 4×20",B1],
+      ["run","Anaerobic Threshold Intervals","3 × 1600 m @ high Z3. Then 3 × 200 m fast."],
+      ["hyrox","Hyrox Aerobic","60 min AMRAP: 4-6 k run, then 1 k row / 1 k ski / 65-50 cal bike"],
+      ["strength","Power B","RDL 4×6 @ 80 kg into 3 max jumps · Sled pull 4×12 m · Straight-arm pulldown 3×12 · Wall balls + push-ups",B2],
+      ["machine","Ski / Row Descending","2 rounds of 300 / 250 / 200 m @ 1 k pace, each machine","Hevy · M4"],
+      ["doubles","HYROX Doubles Simulation","The full eight stations off 1000 m runs. This is the benchmark — take real splits."],
+      ["rest","Easy Aerobic","30-45 min Z2, or rest"] ],
+    [ ["strength","Power A","Sled push 6×12 m · Heavy lunge 3×20 m · Push press 4×5 · Pull-ups 4×5 · Wall balls 4×20",B1],
+      ["run","Anaerobic Threshold Intervals","2000 / 1600 / 1200 m @ high Z3. Then 3 × 200 m."],
+      ["hyrox","Hyrox Aerobic Endurance","60 min AMRAP: 4-6 k run, then 1 k row / 1 k ski / 65-50 cal bike"],
+      ["strength","Power B","RDL 4×6 into jumps · Sled pull 5×12 m · Straight-arm pulldown 3×12 · Wall balls 4×25 + push-ups",B2],
+      ["rest","Rest","Full rest day"],
+      ["doubles","Doubles Intervals","3 blocks off 1000 m runs: ski and push, pull and burpees, lunges and wall balls"],
+      ["rest","Easy Aerobic","30-75 min Z2, or rest"] ],
+    [ ["strength","Power A","2 rounds of 3×12 m sled push · Heavy lunge 3×32 m · Push press 4×5 · Pull-ups 4×5 · Wall balls 5×20",B1],
+      ["run","Anaerobic Threshold Intervals","4 × 1600 m @ high Z3. Then 3 × 200 m."],
+      ["hyrox","Hyrox Aerobic","60 min AMRAP: 5-7 k run, then 1 k row / 100 m carry / 500 m ski / 65-50 cal bike"],
+      ["strength","Power B","RDL 4×6-8 into jumps · Sled pull 2×25 m · Straight-arm pulldown 3×12 · Wall balls 5×20 + push-ups",B2],
+      ["machine","Ski / Row 3 × 350 m","All out. Ski under 50 spm, row under 35 spm.","Hevy · M5"],
+      ["doubles","Doubles Intervals","4 rounds off 1000 m runs, plus a 1000 m finisher"],
+      ["rest","Easy Aerobic","Easy run, bike or machine. Or rest."] ],
+    [ ["strength","Power A · taper","Sled push 2×25 m · Lunge 2×40 m · Push press 4×5 · Pull-ups 4×5 · Wall balls 3×20-30",B1],
+      ["doubles","Doubles Sharpener","3 × (400 m run + one station), all faster than race pace"],
+      ["hyrox","Hyrox Aerobic","3 rounds: 800 m run / 1000 m ski / 50 m carry / 1000 m row"],
+      ["machine","60 s Sharpener","3 × 60 s on ski, row and bike @ fast pace","Hevy · M6"],
+      ["run","Easy Run with Pick-Ups","10 min easy, 2 × 90 s uptempo, 10 min easy"],
+      ["race","Race day","Warm-up: 5-10 min row or ski, 2 activation rounds, 5 min run, 5 × 30 s / 30 s"],
+      ["rest","Recovery","30-60 min Z1-2, or rest"] ],
+  ];
+  const KIND = { run:"Run", strength:"Strength", machine:"Machine", hyrox:"Hyrox", doubles:"Doubles", rest:"Easy", race:"Race" };
+  const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const START = new Date(2026, 9, 26);     // Mon 26 Oct 2026
+  const RACE  = new Date(2026, 11, 19);    // Sat 19 Dec 2026
+
+  const startOfToday = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+  const dayDiff = (a, b) => Math.round((a - b) / 86400000);
+
+  document.getElementById("cdStart").textContent =
+    (() => { const d = dayDiff(START, startOfToday()); return d > 0 ? `${d} days` : d === 0 ? "Today" : "Underway"; })();
+  document.getElementById("cdRace").textContent =
+    (() => { const d = dayDiff(RACE, startOfToday()); return d > 0 ? `${d} days` : d === 0 ? "Today" : "Done"; })();
+
+  const weeksEl = document.getElementById("weeks");
+  let curWeek = 0;
+  W.forEach((_, i) => {
+    const b = document.createElement("button");
+    b.className = "wk"; b.type = "button"; b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(i === 0));
+    b.textContent = "Week " + (i + 1);
+    b.addEventListener("click", () => showWeek(i));
+    weeksEl.appendChild(b);
+  });
+
+  const daysEl = document.getElementById("days");
+  function showWeek(i) {
+    curWeek = i;
+    [...weeksEl.children].forEach((b, j) => b.setAttribute("aria-selected", String(j === i)));
+    document.getElementById("wkTitle").textContent = "Week " + (i + 1);
+    const mon = new Date(START); mon.setDate(mon.getDate() + i * 7);
+    const sun = new Date(mon); sun.setDate(sun.getDate() + 6);
+    const fmt = (d) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    document.getElementById("wkTheme").textContent = `${fmt(mon)} – ${fmt(sun)} · ${THEMES[i]}`;
+
+    daysEl.innerHTML = "";
+    const today = startOfToday();
+    W[i].forEach((s, d) => {
+      const date = new Date(mon); date.setDate(date.getDate() + d);
+      const [kind, name, detail, hevy] = s;
+      const art = mk("article",
+        "card day" + (kind === "rest" ? " rest" : "") + (+date === +today ? " today" : ""));
+
+      const stamp = mk("div", "dstamp");
+      stamp.append(
+        mk("b", null, DAYS[d]),
+        mk("span", "num", `${date.getDate()} ${date.toLocaleDateString("en-GB", { month: "short" })}`)
+      );
+
+      const right = mk("div");
+      const title = mk("h3", "dtitle", name);
+      title.append(document.createTextNode(" "), mk("span", "chip k-" + kind, KIND[kind]));
+      right.append(title, mk("p", "ddetail", detail));
+      if (hevy) right.append(mk("p", "dhevy", hevy));
+
+      art.append(stamp, right);
+      daysEl.append(art);
+    });
+  }
+
+  /* ---------- boot ---------- */
+  function layout() {
+    buildTicks();
+    paint(t2x(target));
+    const btn = tabs.find((t) => t.getAttribute("aria-selected") === "true");
+    pill.style.width = btn.offsetWidth + "px";
+    setPill(btn.offsetLeft);
+  }
+  if (typeof DATA === "object" && DATA) {
+    let used = 0;
+    STATIONS.forEach((st, i) => {
+      const v = DATA.stations && DATA.stations[st.n];
+      if (typeof v === "number" && v > 0) {
+        st.t = v; used++;
+        rowsEl.querySelector(`[data-t="${i}"]`).textContent = ms(v);
+      }
+    });
+    if (DATA.syncedAt) {
+      const dt = new Date(DATA.syncedAt);
+      document.getElementById("syncState").textContent =
+        `Synced ${dt.toLocaleDateString("en-GB",{day:"numeric",month:"short"})} · ${used}/8 measured`;
+    }
+  }
+
+  selectTab(0, false);
+  showWeek(0);
+  render();
+  layout();
+  addEventListener("resize", layout);
+})();
+</script>
+
+</body>
+</html>
