@@ -427,9 +427,14 @@
 </main>
 
 <script>
-/* Live data comes from ./data.json, published by aura_pages_publish.py out of the
-   /aura snapshot. Same origin, so no CORS and no credentials in the page.
-   Absent or stale, the page still works — it just shows its own estimates. */
+/* Optional ./data.json, deliberately NOT published here.
+   This site is public, so no personal data goes near it — the projection, paces
+   and both athletes' figures live in the private Aura dashboard on the Notion
+   page instead, where Notion's permissions apply.
+   The seam is kept on purpose: drop a data.json next to this file on any host
+   that is actually access-controlled and the panels below light up. Same origin,
+   so no CORS and no credentials in the page. Absent, the page just shows its own
+   estimates and nothing breaks. */
 window.DATA = { syncedAt: null, stations: {}, runPace: null };
 </script>
 <script>
