@@ -362,6 +362,21 @@
       </div>
     </div>
 
+    <div class="card" id="teamCard" hidden style="margin-top:1.5rem; padding:1.35rem 1.5rem">
+      <div class="stat-label">Projected team finish</div>
+      <div style="display:flex; align-items:baseline; gap:.9rem; flex-wrap:wrap">
+        <span class="big num" id="projFinish" style="font-size:clamp(2.4rem,8vw,3.4rem)">—</span>
+        <span class="chip" id="projBand" style="background:var(--sunken); color:var(--ink-2)"></span>
+      </div>
+      <p class="sub" id="projGate" style="margin-top:.5rem"></p>
+      <p class="sub" id="projDelta" style="margin-top:.35rem; font-weight:600"></p>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <p class="eyebrow">Where you both are</p>
+      <div class="days" id="athleteCards"></div>
+    </div>
+
     <div class="card soon">
       <span class="pending" id="syncState">Not connected</span>
       <h2 style="margin-top:.55rem">Measured against actual</h2>
@@ -411,10 +426,10 @@
 </main>
 
 <script>
-/* SYNC BLOCK — rewritten in place by the scheduled job.
-   --- BEGIN SYNC DATA --- */
-const DATA = { syncedAt: null, stations: {}, runPace: null };
-/* --- END SYNC DATA --- */
+/* Live data comes from ./data.json, published by aura_pages_publish.py out of the
+   /aura snapshot. Same origin, so no CORS and no credentials in the page.
+   Absent or stale, the page still works — it just shows its own estimates. */
+window.DATA = { syncedAt: null, stations: {}, runPace: null };
 </script>
 <script>
 (() => {
@@ -683,6 +698,7 @@ const DATA = { syncedAt: null, stations: {}, runPace: null };
     document.getElementById("legStation").textContent = hms(st);
     document.getElementById("legRox").textContent = hms(rox);
 
+    if (deltaHook) deltaHook();
     scrub.setAttribute("aria-valuenow", String(target));
     scrub.setAttribute("aria-valuetext", spoken(target));
   }
@@ -945,6 +961,79 @@ const DATA = { syncedAt: null, stations: {}, runPace: null };
     pill.style.width = btn.offsetWidth + "px";
     setPill(btn.offsetLeft);
   }
+  // ---- live data from ./data.json -------------------------------------------
+  const paceStr = (m) => m ? `${Math.floor(m)}:${pad(Math.round((m % 1) * 60))}` : "—";
+  const finStr  = (m) => m ? `${Math.floor(m / 60)}:${pad(Math.round(m % 60))}` : "—";
+
+  function applyLive(D) {
+    const pr = D && D.projection;
+    if (pr) {
+      const card = document.getElementById("teamCard");
+      card.hidden = false;
+      document.getElementById("projFinish").textContent = finStr(pr.finish_minutes);
+      document.getElementById("projBand").textContent = pr.band || "";
+      const gate = pr.gated_by;
+      document.getElementById("projGate").textContent = pr.complete
+        ? `Run leg gated by ${gate} at ${paceStr(pr.team_race_pace)}/km. In Doubles you run all 8 km together, so the slower partner sets the pace.`
+        : `${gate} only — no data for the other half of the pair yet, so this is not a team projection.`;
+
+      // The honest comparison: what the target demands vs what is projected today.
+      const restate = () => {
+        const st = STATIONS.reduce((a, x) => a + x.t, 0);
+        const need = (target - st - rox) / 8 / 60;          // min/km
+        const el = document.getElementById("projDelta");
+        if (need <= 0) { el.textContent = ""; return; }
+        const d = Math.round((pr.team_race_pace - need) * 60);
+        el.style.color = d <= 0 ? "var(--run-w)" : "var(--station)";
+        el.textContent = d <= 0
+          ? `Inside it. ${paceStr(need)}/km needed, ${paceStr(pr.team_race_pace)}/km projected — ${Math.abs(d)} s/km in hand.`
+          : `${paceStr(need)}/km needed, ${paceStr(pr.team_race_pace)}/km projected — ${d} s/km to find.`;
+      };
+      restate();
+      deltaHook = restate;
+    }
+
+    const wrap = document.getElementById("athleteCards");
+    Object.values((D && D.athletes) || {}).forEach((a) => {
+      const art = mk("article", "card day");
+      art.style.gridTemplateColumns = "1fr";
+      const h = mk("h3", "dtitle", a.name);
+      const waiting = (a.waiting_on || []).length && !a.training_pace;
+      h.append(document.createTextNode(" "),
+        mk("span", "chip " + (waiting ? "k-rest" : "k-run"), waiting ? "Waiting on setup" : "Tracking"));
+      const rows = [
+        ["Training pace", a.training_pace ? paceStr(a.training_pace) + "/km" : "—"],
+        ["Best 1 km", a.best_1km ? paceStr(a.best_1km) : "—"],
+        ["Runs, 28 days", a.runs_28d != null ? String(a.runs_28d) : "—"],
+        ["Gym, 28 days", a.gym_28d != null ? String(a.gym_28d) : "—"],
+      ];
+      const grid = mk("div");
+      grid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.75rem;margin-top:.6rem";
+      rows.forEach(([k, v]) => {
+        const cell = mk("div");
+        cell.append(mk("div", "stat-label", k), mk("div", "num", v));
+        cell.lastChild.style.cssText = "font-size:1.15rem;font-weight:600;letter-spacing:-.02em";
+        grid.append(cell);
+      });
+      art.append(h, grid);
+      if (waiting) art.append(mk("p", "dhevy", a.waiting_on.join(" · ")));
+      wrap.append(art);
+    });
+
+    const el = document.getElementById("syncState");
+    if (D && D.generated_at) {
+      const dt = new Date(D.generated_at);
+      el.textContent = `Synced ${dt.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · via /aura`;
+    }
+  }
+
+  let deltaHook = null;
+
+  fetch("./data.json", { cache: "no-cache" })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((D) => { if (D) { window.DATA = D; applyLive(D); } })
+    .catch(() => {});   // no data.json yet: the page keeps its own estimates
+
   if (typeof DATA === "object" && DATA) {
     let used = 0;
     STATIONS.forEach((st, i) => {
